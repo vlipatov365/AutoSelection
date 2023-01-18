@@ -5,6 +5,7 @@ use \Bitrix\Main\Loader;
 use Me\AutoSelection as Aslctn;
 use Bitrix\Main\Localization\Loc;
 use Bitrix\Main\ModuleManager;
+use Bitrix\Main\IO;
 
 Loc::loadMessages(__FILE__);
 
@@ -38,8 +39,10 @@ class me_autoselection extends CModule
         global $APPLICATION;
         ModuleManager::registerModule($this->MODULE_ID);
         $this->InstallDB();
-        $this->InstalIblock();
         $this->InstallHlBlock();
+        $this->InstallEvents();
+        $this->InstalIblock();
+        $this->InstallDirectories();
     }
 
     function DoUnInstall()
@@ -48,6 +51,8 @@ class me_autoselection extends CModule
         $this->UnInstallDB();
         $this->UnInstallIblock();
         $this->UnInstallHlBlock();
+        $this->UnInstallEvents();
+        $this->UnInstallDirectories();
         ModuleManager::unRegisterModule($this->MODULE_ID);
     }
     //endregion Установка и удаление
@@ -70,6 +75,7 @@ class me_autoselection extends CModule
         Loader::includeModule($this->MODULE_ID);
         return Aslctn\Migrations\Hlblock::up();
     }
+
     public function UnInstallHlBlock()
     {
         Loader::includeModule($this->MODULE_ID);
@@ -105,7 +111,69 @@ class me_autoselection extends CModule
     }
     //endregion БД
     //region События
+    function InstallEvents()
+    {
+        $eventManager = Main\EventManager::getInstance();
+        /** Регистрация своего типа пользовательского поля(Справочники) */
+        $eventManager->RegisterEventHandler(
+            'main',
+            'OnUserTypeBuildList',
+            $this->MODULE_ID,
+            'Me\Autoselection\UserField\Type\AutobrandsType',
+            'getUserTypeDescription'
+        );
+        /** Установка типа свойства Инфоблока */
+        $eventManager->registerEventHandler(
+            'iblock',
+            'OnIblockPropertyBuildList',
+            $this->MODULE_ID,
+            'Me\Autoselection\Integration\AutobrandsProperty',
+            'getUserTypeDescription'
+        );
+    }
+
+    function UnInstallEvents()
+    {
+        $eventManager = Main\EventManager::getInstance();
+        $eventManager->unRegisterEventHandler(
+            'main',
+            'OnUserTypeBuildList',
+            $this->MODULE_ID,
+            'Me\Autoselection\UserField\Type\AutobrandsType',
+            'getUserTypeDescription'
+        );
+        /** Удаление типа свойства Инфоблока */
+        $eventManager->unRegisterEventHandler(
+            'iblock',
+            'OnIblockPropertyBuildList',
+            $this->MODULE_ID,
+            'Me\Autoselection\Integration\AutobrandsProperty',
+            'getUserTypeDescription'
+        );
+    }
     //endregion События
+    //region Файлы и Папки
+    function InstallDirectories()
+    {
+        copyDirFiles(
+            __DIR__ . "/components",
+            Main\Application::getDocumentRoot() . '/local/components',
+            true,
+            true
+        );
+    }
+
+    function UnInstallDirectories()
+    {
+        $folders = [
+            Main\Application::getDocumentRoot() . '/local/components/me'
+        ];
+        foreach ($folders as $folder) {
+            IO\Directory::deleteDirectory($folder);
+        }
+    }
+
+    //endregion Файлы и Папки
     protected function isVersionD7()
 
     {

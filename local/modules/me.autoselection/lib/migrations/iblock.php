@@ -104,17 +104,17 @@ class Iblock
     protected static function fieldBrand() :array
     {
         return [
-            'SORT' => 10,
+            'SORT' => 20,
             'NAME' => Loc::getMessage('IBLOCK_BRAND_FIELD'),
             'CODE' => 'BRAND',
-            'TYPE' => 'S:employee'
+            'TYPE' => 'S:autobrands'
         ];
     }
 
     protected static function fieldCondition() :array
     {
         return [
-            'SORT' => 20,
+            'SORT' => 30,
             'NAME' => Loc::getMessage('IBLOCK_CONDITION_FIELD'),
             'CODE' => 'CONDITION',
             'TYPE' => 'S'
@@ -124,7 +124,7 @@ class Iblock
     protected static function fieldYear() :array
     {
         return [
-            'SORT' => 30,
+            'SORT' => 40,
             'NAME' => Loc::getMessage('IBLOCK_YEAR_FIELD'),
             'CODE' => 'YEAR',
             'TYPE' => 'N'
@@ -134,7 +134,7 @@ class Iblock
     protected static function fieldPrice() :array
     {
         return [
-            'SORT' => 40,
+            'SORT' => 50,
             'NAME' => Loc::getMessage('IBLOCK_PRICE_FIELD'),
             'CODE' => 'PRICE',
             'TYPE' => 'N'
@@ -144,7 +144,7 @@ class Iblock
     protected static function fieldRainSensor() :array
     {
         return [
-            'SORT' => 50,
+            'SORT' => 60,
             'NAME' => Loc::getMessage('IBLOCK_RAINSENS_FIELD'),
             'CODE' => 'RAINSENS',
             'TYPE' => 'S'
