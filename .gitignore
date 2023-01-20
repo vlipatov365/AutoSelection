@@ -1,2 +1,6 @@
+.gitignore
 .idea
 bitrix
+local/components
+test.php
+/local/components/

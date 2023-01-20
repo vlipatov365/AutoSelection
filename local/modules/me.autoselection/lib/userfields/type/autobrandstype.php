@@ -18,7 +18,7 @@ class AutobrandsType extends BaseType
         return [
             'CLASS_NAME' => __CLASS__,
             'DESCRIPTION' => Loc::getMessage('PROPERTY_TITLE'),
-            'BaseType' => CUserTypeManager::BASE_TYPE_ENUM
+            'BaseType' => CUserTypeManager::BASE_TYPE_STRING
         ];
     }
     /**

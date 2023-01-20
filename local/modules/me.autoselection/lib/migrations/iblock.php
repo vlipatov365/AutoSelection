@@ -37,13 +37,31 @@ class Iblock
                 'SITE_ID' => 's1',
                 'DESCRIPTION' => '',
                 'WORKFLOW' => 'N',
-                'BIZPROC' => 'Y'
+                'BIZPROC' => 'Y',
+                'FIELDS' => [
+                    "NAME" => [
+                        "IS_REQUIRED" => "N",
+                        "SHOW_ADD_FORM" => "N",
+                        "SHOW_EDIT_FORM" => "N",
+                        "SHOW_FIELD_PREVIEW" => "N"
+                    ],
+                    "DETAIL_PICTURE" => [
+                        "IS_REQUIRED" => "Y",
+                        "DEFAULT_VALUE" => array(
+                            "SCALE" => "Y",
+                            "WIDTH" => "600",
+                            "HEIGHT" => "600",
+                            "IGNORE_ERRORS" => "Y",
+                            "METHOD" => "resample",
+                            "COMPRESSION" => "95"
+                        )
+                    ]
+                ]
             ];
             //TODO определить какие поля надо создать.
             $iblockId = Helpers\Iblock::createIblock($arFields);
             if ($iblockId > 0) {
                 $obList = new \CList($iblockId);
-
                 foreach (self::newFields() as $newField) {
                     $obList->addField($newField);
                 }
@@ -104,7 +122,7 @@ class Iblock
     protected static function fieldBrand() :array
     {
         return [
-            'SORT' => 20,
+            'SORT' => 10,
             'NAME' => Loc::getMessage('IBLOCK_BRAND_FIELD'),
             'CODE' => 'BRAND',
             'TYPE' => 'S:autobrands'

@@ -12,12 +12,17 @@ use Me\AutoSelection\Helper;
 
 class HlBlock
 {
+    public function getHlBlockName()
+    {
+        return "MeAutoSelectionBrands";
+    }
+
     public static function up()
     {
         Helper::initModules(['highloadblock']);
 
         $exists = Helpers\HighloadBlock::getHlblock(
-            ['NAME' => 'MeAutoSelectionBrands'],
+            ['NAME' => self::getHlBlockName()],
             ['ID']
         );
         if (empty($exists)) {
@@ -38,8 +43,21 @@ class HlBlock
                     'FIELD_NAME' => 'UF_BRANDNAME',
                     'USER_TYPE_ID' => 'string',
                     'SORT' => 100,
-                    'LABEL' => Loc::getMessage("UF_BRANDNAME")
+                    'LABEL' => Loc::getMessage("UF_BRANDNAME"),
+                    'VALIDATION' => function () {
+                        return array(
+                            new Fields\Validators\UniqueValidator(Loc::getMessage("ALLREADY_EXISTS"))
+                        );
+                    }
+
                 ]));
+                $hlEntityDataClass = Helpers\HighloadBlock::getEntityDataClass($id);
+                $elements = self::hlElements();
+                foreach ($elements as $element) {
+                    $hlEntityDataClass::add([
+                        "UF_BRANDNAME" => $element
+                    ]);
+                }
             } else {
                 throw new SystemException(implode(';', $result->getErrorMessages()));
             }
@@ -113,9 +131,20 @@ class HlBlock
         }
         return $arFields;
     }
+
     function addUserTypeEntity($field)
     {
         $obUserField = new \CUserTypeEntity;
         $obUserField->Add($field);
+    }
+
+    function hlElements()
+    {
+        return [
+            'Audi',
+            'BMW',
+            'Subaru',
+            'Tesla'
+        ];
     }
 }
