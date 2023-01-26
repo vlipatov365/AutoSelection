@@ -43,13 +43,7 @@ class HlBlock
                     'FIELD_NAME' => 'UF_BRANDNAME',
                     'USER_TYPE_ID' => 'string',
                     'SORT' => 100,
-                    'LABEL' => Loc::getMessage("UF_BRANDNAME"),
-                    'VALIDATION' => function () {
-                        return array(
-                            new Fields\Validators\UniqueValidator(Loc::getMessage("ALLREADY_EXISTS"))
-                        );
-                    }
-
+                    'LABEL' => Loc::getMessage("UF_BRANDNAME")
                 ]));
                 $hlEntityDataClass = Helpers\HighloadBlock::getEntityDataClass($id);
                 $elements = self::hlElements();

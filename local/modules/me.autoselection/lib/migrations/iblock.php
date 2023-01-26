@@ -44,17 +44,6 @@ class Iblock
                         "SHOW_ADD_FORM" => "N",
                         "SHOW_EDIT_FORM" => "N",
                         "SHOW_FIELD_PREVIEW" => "N"
-                    ],
-                    "DETAIL_PICTURE" => [
-                        "IS_REQUIRED" => "Y",
-                        "DEFAULT_VALUE" => array(
-                            "SCALE" => "Y",
-                            "WIDTH" => "600",
-                            "HEIGHT" => "600",
-                            "IGNORE_ERRORS" => "Y",
-                            "METHOD" => "resample",
-                            "COMPRESSION" => "95"
-                        )
                     ]
                 ]
             ];
@@ -89,7 +78,7 @@ class Iblock
     protected static function fieldDefaultSettings() :array
     {
         return [
-            'IS_REQUIRED' => 'N',
+            'IS_REQUIRED' => 'Y',
             'MULTIPLE' => 'N',
             'DEFAULT_VALUE' => '',
             'USER_TYPE_SETTINGS' => NULL,
@@ -122,7 +111,7 @@ class Iblock
     protected static function fieldBrand() :array
     {
         return [
-            'SORT' => 10,
+            'SORT' => 20,
             'NAME' => Loc::getMessage('IBLOCK_BRAND_FIELD'),
             'CODE' => 'BRAND',
             'TYPE' => 'S:autobrands'

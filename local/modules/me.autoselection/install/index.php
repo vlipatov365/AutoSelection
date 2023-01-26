@@ -39,9 +39,9 @@ class me_autoselection extends CModule
         global $APPLICATION;
         ModuleManager::registerModule($this->MODULE_ID);
         $this->InstallDB();
-        $this->InstallHlBlock();
         $this->InstallEvents();
         $this->InstalIblock();
+        $this->InstallHlBlock();
         $this->InstallDirectories();
     }
 
@@ -114,12 +114,12 @@ class me_autoselection extends CModule
     function InstallEvents()
     {
         $eventManager = Main\EventManager::getInstance();
-        /** Регистрация своего типа пользовательского поля(Справочники) */
+        /** Регистрация своего типа пользовательского поля */
         $eventManager->RegisterEventHandler(
             'main',
             'OnUserTypeBuildList',
             $this->MODULE_ID,
-            'Me\Autoselection\UserField\Type\AutobrandsType',
+            'Me\Autoselection\UserFields\Type\AutobrandsType',
             'getUserTypeDescription'
         );
         /** Установка типа свойства Инфоблока */
