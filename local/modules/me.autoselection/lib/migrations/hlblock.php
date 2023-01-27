@@ -85,7 +85,7 @@ class HlBlock
             'SORT' => $data['SORT'] ?: 100,
             'MULTIPLE' => $data['MULTIPLE'] ?: 'N',
             'MANDATORY' => $data['MANDATORY'] ?: 'N',
-            'SHOW_FILTER' => $data['SHOW_FILTER'] ?: 'N',
+            'SHOW_FILTER' => $data['SHOW_FILTER'] ?: 'Y',
             'SHOW_IN_LIST' => $data['SHOW_IN_LIST'] ?: 'Y',
             'EDIT_IN_LIST' => $data['EDIT_IN_LIST'] ?: 'Y',
             'IS_SEARCHABLE' => $data['IS_SEARCHABLE'] ?: 'N',

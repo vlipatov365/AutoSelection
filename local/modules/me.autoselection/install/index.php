@@ -130,6 +130,14 @@ class me_autoselection extends CModule
             'Me\Autoselection\Integration\AutobrandsProperty',
             'getUserTypeDescription'
         );
+        /**Установка события для добавления кнопки меню*/
+        $eventManager->registerEventHandler(
+            'main',
+            'OnEpilog',
+            $this->MODULE_ID,
+            'Me\AutoSelection\Handlers\BuildOnBeforeProlog',
+            'addHeaderButton'
+        );
     }
 
     function UnInstallEvents()
@@ -149,6 +157,14 @@ class me_autoselection extends CModule
             $this->MODULE_ID,
             'Me\Autoselection\Integration\AutobrandsProperty',
             'getUserTypeDescription'
+        );
+        /**Удаление события для добавления кнопки меню*/
+        $eventManager->unRegisterEventHandler(
+            'main',
+            'OnEpilog',
+            $this->MODULE_ID,
+            'Me\AutoSelection\Handlers\BuildOnBeforeProlog',
+            'addHeaderButton'
         );
     }
     //endregion События
