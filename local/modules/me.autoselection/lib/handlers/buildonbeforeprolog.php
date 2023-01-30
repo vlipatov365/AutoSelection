@@ -13,6 +13,5 @@ class BuildOnBeforeProlog
         Extension::load('ui.bootstrap4');
         $asset = Asset::getInstance();
         $asset->addJs('/local/components/me/autoselection/scripts/headerbutton/script.js', true);
-        echo 'Kkkkkkkkk';
     }
 }

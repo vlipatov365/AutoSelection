@@ -39,12 +39,6 @@ class Iblock
                 'WORKFLOW' => 'N',
                 'BIZPROC' => 'Y',
                 'FIELDS' => [
-                    "NAME" => [
-                        "IS_REQUIRED" => "N",
-                        "SHOW_ADD_FORM" => "N",
-                        "SHOW_EDIT_FORM" => "N",
-                        "SHOW_FIELD_PREVIEW" => "N"
-                    ]
                 ]
             ];
             //TODO определить какие поля надо создать.

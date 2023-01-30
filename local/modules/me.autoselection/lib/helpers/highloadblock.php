@@ -65,9 +65,4 @@ class HighloadBlock extends Helper
     {
         return self::getEntity($hlBlockId)->getFields();
     }
-
-    public static function getDocumentFieldsHL(int $hlBlockId)
-    {
-
-    }
 }

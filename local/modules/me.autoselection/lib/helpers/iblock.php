@@ -3,6 +3,7 @@
 namespace Me\AutoSelection\Helpers;
 
 use Bitrix\Iblock\IblockTable;
+use Bitrix\Main\SystemException;
 use Me\AutoSelection\Helper;
 
 class Iblock extends Helper
@@ -32,5 +33,36 @@ class Iblock extends Helper
     {
         $ob = new \CIBlock();
         return $ob::Delete($existId);
+    }
+
+    public static function getIblockId(
+        $filter = []
+    ) : int
+    {
+        $arIblockId = self::getIblock(
+            $filter,
+            ['ID']
+        );
+        $iBlockId = (int) $arIblockId['ID'];
+        return $iBlockId;
+    }
+
+    public static function getEntity(int $iBlockId) :object
+    {
+        if (empty($iBlockId) || $iBlockId < 1) {
+            throw new SystemException("Справочник не найден");
+        }
+        $iBlock = IblockTable::getById($iBlockId)->fetch();
+        $entity = IblockTable::compileEntity('meAutoSelection');
+        return $entity;
+    }
+
+    public static function getEntityDataClass(int $iBlockId)
+    {
+        return self::getEntity($iBlockId)->getDataClass();
+    }
+    public static function getFieldsMap(int $iBlockId)
+    {
+        return self::getEntity($iBlockId)->getFields();
     }
 }
