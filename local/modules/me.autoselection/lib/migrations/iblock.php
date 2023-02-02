@@ -11,7 +11,7 @@ use Me\AutoSelection\Helper;
 
 class Iblock
 {
-    public static function up()
+    public static function up($site)
     {
         $exists = [];
         Helper::initModules(['lists']);
@@ -19,14 +19,7 @@ class Iblock
             ['CODE' => 'me_autoselection'],
             ['ID']
         );
-        //TODO сделать проверку на существование инфоблока при установке. Лучше отдельный метод.
-        //TODO вынести в step1 при установке запрос на выбор сайта($arFields['SITE_ID']) для которого устанавливается Инфоблок
         if (empty($exists)) {
-//            $siteList = SiteTable::getList(
-//                [
-//                    'select' => ['LID']
-//                ]
-//            )->fetchAll();
             $arFields = [
                 'NAME' => Loc::getMessage('MIG_IBLOCK_NAME'),
                 'CODE' => 'me_autoselection',
@@ -34,12 +27,11 @@ class Iblock
                 'IBLOCK_TYPE_ID' => 'lists',
                 'LIST_PAGE_URL' => '',
                 'DETAIL_PAGE_URL' => '',
-                'SITE_ID' => 's1',
+                'SITE_ID' => $site,
+                'VERSION' => '1',
                 'DESCRIPTION' => '',
                 'WORKFLOW' => 'N',
-                'BIZPROC' => 'Y',
-                'FIELDS' => [
-                ]
+                'BIZPROC' => 'Y'
             ];
             //TODO определить какие поля надо создать.
             $iblockId = Helpers\Iblock::createIblock($arFields);

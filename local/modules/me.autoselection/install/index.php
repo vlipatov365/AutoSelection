@@ -6,6 +6,7 @@ use Me\AutoSelection as Aslctn;
 use Bitrix\Main\Localization\Loc;
 use Bitrix\Main\ModuleManager;
 use Bitrix\Main\IO;
+use Bitrix\Main\SystemException;
 
 Loc::loadMessages(__FILE__);
 
@@ -16,6 +17,8 @@ class me_autoselection extends CModule
     var $MODULE_VERSION_DATE;
     var $MODULE_NAME;
     var $MODULE_DESCRIPTION;
+
+    var $REQUEST;
 
     function __construct()
     {
@@ -31,36 +34,58 @@ class me_autoselection extends CModule
         $this->MODULE_DESCRIPTION = Loc::getMessage('MODULE_DESCRIPTION');
         $this->PARTNER_NAME = Loc::getMessage('PARTNER_NAME');
         $this->PARTNER_URI = Loc::getMessage('PARTNER_URI');
+
+        $context = Main\Application::getInstance()->getContext();
+        $this->REQUEST = $context->getRequest();
     }
 
     //region Установка и удаление
     function DoInstall()
     {
-        global $APPLICATION;
-        ModuleManager::registerModule($this->MODULE_ID);
-        $this->InstallDB();
-        $this->InstallEvents();
-        $this->InstalIblock();
-        $this->InstallHlBlock();
-        $this->InstallDirectories();
+        global $APPLICATION, $step, $site;
+        $step = IntVal($step);
+        if ($step < 2) {
+            $this->checkBeforeInstall();
+            $APPLICATION->includeAdminFile(
+                'Установка',
+                $this->getPath() . '/install/step1.php'
+            );
+        } elseif ($step === 2) {
+            ModuleManager::registerModule($this->MODULE_ID);
+            $arSites = \Bitrix\Main\SiteTable::getList()->fetchAll();
+            $arSitesToInstall = [];
+            foreach ($arSites as $site) {
+                if ($site['LID'] = $this->REQUEST[$site['LID']]) {
+                    $arSitesToInstall [] = [
+                        $site['LID']
+                    ];
+                }
+                foreach ($arSitesToInstall as $siteToInstall) {
+                    $this->InstallIblock($siteToInstall);
+                    $this->InstallHlBlock($siteToInstall);
+                }
+            }
+            //TODO решить какой вариант проверки лучше. 1) Проверка каждого компонента в конце установки. 2) Отдельная проверка каждого компонента после его установки
+            //TODO возможно стоит изменить обращение к таблице сайтов на одно единственное в самом начале.
+            $this->InstallDB();
+            $this->InstallDirectories();
+            $this->InstallFiles();
+            $this->InstallEvents();
+        }
     }
 
     function DoUnInstall()
     {
         global $APPLICATION;
-        $this->UnInstallDB();
         $this->UnInstallIblock();
-        $this->UnInstallHlBlock();
-        $this->UnInstallEvents();
-        $this->UnInstallDirectories();
         ModuleManager::unRegisterModule($this->MODULE_ID);
     }
     //endregion Установка и удаление
     //region Инфо-блок
-    public function InstalIblock()
+    public function InstallIblock($site)
     {
         Loader::includeModule($this->MODULE_ID);
-        return Aslctn\Migrations\Iblock::up();
+        return Aslctn\Migrations\Iblock::up($site);
     }
 
     public function UnInstallIblock()
@@ -70,10 +95,10 @@ class me_autoselection extends CModule
     }
     //endregion Инфо-блок
     //region HL-блок
-    public function InstallHlBlock()
+    public function InstallHlBlock($site)
     {
         Loader::includeModule($this->MODULE_ID);
-        return Aslctn\Migrations\Hlblock::up();
+        return Aslctn\Migrations\Hlblock::up($site);
     }
 
     public function UnInstallHlBlock()
@@ -205,6 +230,14 @@ class me_autoselection extends CModule
             : $path;
     }
 
+    protected function checkBeforeInstall()
+    {
+        global $APPLICATION;
+        if (!$this->isVersionD7()) {
+            throw new SystemException(Loc::getMessage('ME_AS_VERSION_ERROR'));
+        }
+    }
+
     protected function context()
     {
         return Main\Application::getInstance()->getContext();
@@ -213,5 +246,10 @@ class me_autoselection extends CModule
     protected function connection()
     {
         return Main\Application::getConnection();
+    }
+
+    protected function siteSelection()
+    {
+
     }
 }

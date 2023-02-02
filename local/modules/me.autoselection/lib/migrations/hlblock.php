@@ -17,7 +17,7 @@ class HlBlock
         return "MeAutoSelectionBrands";
     }
 
-    public static function up()
+    public static function up($site)
     {
         Helper::initModules(['highloadblock']);
 
@@ -35,7 +35,7 @@ class HlBlock
                 Helpers\Options::setParam('ME_ATSLCTN_BRANDS_ID', $id);
                 HighloadBlockLangTable::add([
                     'ID' => $id,
-                    'LID' => SITE_ID,
+                    'LID' => $site,
                     'NAME' => Loc::getMessage('ME_ATSLCTN_BRANDS')
                 ]);
 

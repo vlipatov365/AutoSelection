@@ -28,7 +28,9 @@ $APPLICATION->IncludeComponent('bitrix:lists.list','',     Array(
 //    "BIZPROC_WORKFLOW_START_URL" => "bizproc.workflow.start.php?element_id=#element_id#&list_id=#list_id#&workflow_template_id=#workflow_template_id#"
 ));
 
-
+echo '<pre>';
+print_r($arParams);
+echo '</pre>';
 ?>
 <?php
 require($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/main/include/epilog.php");
