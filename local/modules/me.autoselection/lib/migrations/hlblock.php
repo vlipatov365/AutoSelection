@@ -45,13 +45,13 @@ class HlBlock
                     'SORT' => 100,
                     'LABEL' => Loc::getMessage("UF_BRANDNAME")
                 ]));
-                $hlEntityDataClass = Helpers\HighloadBlock::getEntityDataClass($id);
-                $elements = self::hlElements();
-                foreach ($elements as $element) {
-                    $hlEntityDataClass::add([
-                        "UF_BRANDNAME" => $element
-                    ]);
-                }
+                self::addUserTypeEntity(self::getUfArFields($id, [
+                    'FIELD_NAME' => 'UF_XML_ID',
+                    'USER_TYPE_ID' => 'string',
+                    'SORT' => 200,
+                    'LABEL' => 'UF_XML_ID'
+                ]));
+                self::addHlElements($id);
             } else {
                 throw new SystemException(implode(';', $result->getErrorMessages()));
             }
@@ -140,5 +140,17 @@ class HlBlock
             'Subaru',
             'Tesla'
         ];
+    }
+
+    public static function addHlElements($id)
+    {
+        $hlEntityDataClass = Helpers\HighloadBlock::getEntityDataClass($id);
+        $elements = self::hlElements();
+        foreach ($elements as $element) {
+            $hlEntityDataClass::add([
+                "UF_BRANDNAME" => $element,
+                "UF_XML_ID" => $element
+            ]);
+        }
     }
 }

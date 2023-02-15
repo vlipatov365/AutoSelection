@@ -22,7 +22,6 @@ class me_autoselection extends CModule
 
     function __construct()
     {
-        global $APPLICATION;
         $arModuleVersion = [];
         include(dirname(__FILE__) . '/version.php');
 
@@ -43,7 +42,9 @@ class me_autoselection extends CModule
     function DoInstall()
     {
         global $APPLICATION, $step, $site;
+        $this->InstallFiles();
         $step = IntVal($step);
+
         if ($step < 2) {
             $this->checkBeforeInstall();
             $APPLICATION->includeAdminFile(
@@ -55,20 +56,18 @@ class me_autoselection extends CModule
             $arSites = \Bitrix\Main\SiteTable::getList()->fetchAll();
             $arSitesToInstall = [];
             foreach ($arSites as $site) {
+
                 if ($site['LID'] = $this->REQUEST[$site['LID']]) {
                     $arSitesToInstall [] = [
                         $site['LID']
                     ];
                 }
                 foreach ($arSitesToInstall as $siteToInstall) {
-                    $this->InstallIblock($siteToInstall);
                     $this->InstallHlBlock($siteToInstall);
+                    $this->InstallIblock($siteToInstall);
+                    $this->addElements();
                 }
             }
-            //TODO решить какой вариант проверки лучше. 1) Проверка каждого компонента в конце установки. 2) Отдельная проверка каждого компонента после его установки
-            //TODO возможно стоит изменить обращение к таблице сайтов на одно единственное в самом начале.
-            $this->InstallDB();
-            $this->InstallDirectories();
             $this->InstallFiles();
             $this->InstallEvents();
         }
@@ -78,6 +77,8 @@ class me_autoselection extends CModule
     {
         global $APPLICATION;
         $this->UnInstallIblock();
+        $this->UnInstallHlBlock();
+        $this->UnInstallFiles();
         ModuleManager::unRegisterModule($this->MODULE_ID);
     }
     //endregion Установка и удаление
@@ -107,34 +108,7 @@ class me_autoselection extends CModule
         return Aslctn\Migrations\Hlblock::down();
     }
     //endregion HL-блок
-    //region БД
-    function InstallDB()
-    {
-        global $APPLICATION;
-        Loader::includeModule($this->MODULE_ID);
-        $entity = Aslctn\AutoselectionTable::getEntity();
-        $tableName = $entity->getDBTableName();
-        if (!$this->connection()->isTableExists($tableName)) {
-            $entity->createDbTable();
-        }
-    }
 
-    function UnInstallDB()
-    {
-        global $APPLICATION, $DB;
-        $sqlError = $DB->RunSqlBatch(
-            $this->getPath() . '/install/db/mysql/uninstall.sql'
-        );
-        if ($sqlError !== false) {
-            $error = array_merge($error, $sqlError);
-        }
-
-        if (!empty($error)) {
-            $APPLICATION->ThrowException(implode('', $error));
-            return false;
-        }
-    }
-    //endregion БД
     //region События
     function InstallEvents()
     {
@@ -158,9 +132,16 @@ class me_autoselection extends CModule
         /**Установка события для добавления кнопки меню*/
         $eventManager->registerEventHandler(
             'main',
-            'OnEpilog',
+            'BeforeProlog',
             $this->MODULE_ID,
             'Me\AutoSelection\Handlers\BuildOnBeforeProlog',
+            'bootstrapOn'
+        );
+        $eventManager->registerEventHandler(
+            'main',
+            'OnEpilog',
+            $this->MODULE_ID,
+            'Me\AutoSelection\Handlers\BuildOnBeforeEpilog',
             'addHeaderButton'
         );
     }
@@ -186,28 +167,44 @@ class me_autoselection extends CModule
         /**Удаление события для добавления кнопки меню*/
         $eventManager->unRegisterEventHandler(
             'main',
-            'OnEpilog',
+            'OnProlog',
             $this->MODULE_ID,
             'Me\AutoSelection\Handlers\BuildOnBeforeProlog',
+            'bootstrapOn'
+        );
+
+        $eventManager->unRegisterEventHandler(
+            'main',
+            'OnEpilog',
+            $this->MODULE_ID,
+            'Me\AutoSelection\Handlers\BuildOnBeforeEpilog',
             'addHeaderButton'
         );
     }
     //endregion События
+
     //region Файлы и Папки
-    function InstallDirectories()
+    function InstallFiles()
     {
         copyDirFiles(
             __DIR__ . "/components",
-            Main\Application::getDocumentRoot() . '/local/components',
+            $_SERVER['DOCUMENT_ROOT'] . "/local/components",
+            true,
+            true
+        );
+        copyDirFiles(
+            __DIR__ . "/public",
+            $_SERVER['DOCUMENT_ROOT'] . "/local/public",
             true,
             true
         );
     }
 
-    function UnInstallDirectories()
+    function UnInstallFiles()
     {
         $folders = [
-            Main\Application::getDocumentRoot() . '/local/components/me'
+            $_SERVER['DOCUMENT_ROOT'] . '/local/components/me',
+            $_SERVER['DOCUMENT_ROOT'] . '/local/public/me',
         ];
         foreach ($folders as $folder) {
             IO\Directory::deleteDirectory($folder);
@@ -230,6 +227,11 @@ class me_autoselection extends CModule
             : $path;
     }
 
+    protected function addElements()
+    {
+        return Aslctn\Migrations\Iblock::addElements();
+    }
+
     protected function checkBeforeInstall()
     {
         global $APPLICATION;
@@ -246,10 +248,5 @@ class me_autoselection extends CModule
     protected function connection()
     {
         return Main\Application::getConnection();
-    }
-
-    protected function siteSelection()
-    {
-
     }
 }

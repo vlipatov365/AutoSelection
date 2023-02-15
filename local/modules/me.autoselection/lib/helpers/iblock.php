@@ -23,6 +23,7 @@ class Iblock extends Helper
             return $res;
         return [];
     }
+
     public static function createIblock($fields)
     {
         $ob = new \CIBlock();
@@ -37,32 +38,21 @@ class Iblock extends Helper
 
     public static function getIblockId(
         $filter = []
-    ) : int
+    ): int
     {
         $arIblockId = self::getIblock(
             $filter,
             ['ID']
         );
-        $iBlockId = (int) $arIblockId['ID'];
-        return $iBlockId;
+        if (!empty($arIblockId['ID'])) {
+            return intval($arIblockId['ID']);
+        } else
+            throw new SystemException('Не установлен необходимый инфоблок');
     }
 
-    public static function getEntity(int $iBlockId) :object
+    public static function getEntity(string $apiCode): object
     {
-        if (empty($iBlockId) || $iBlockId < 1) {
-            throw new SystemException("Справочник не найден");
-        }
-        $iBlock = IblockTable::getById($iBlockId)->fetch();
-        $entity = IblockTable::compileEntity('meAutoSelection');
-        return $entity;
-    }
+        return IblockTable::compileEntity($apiCode);
 
-    public static function getEntityDataClass(int $iBlockId)
-    {
-        return self::getEntity($iBlockId)->getDataClass();
-    }
-    public static function getFieldsMap(int $iBlockId)
-    {
-        return self::getEntity($iBlockId)->getFields();
     }
 }

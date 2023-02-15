@@ -15,6 +15,6 @@ class AutobrandsUfComponent extends BaseUfComponent
      */
     protected static function getUserTypeId(): string
     {
-        return AutobrandsType::USER_TYPE_ID;
+        return AutobrandsType::class;
     }
 }

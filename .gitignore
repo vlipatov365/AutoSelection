@@ -3,4 +3,6 @@
 bitrix
 local/components
 test.php
+/local/public
 /local/components/
+/bxApiDocs-16.5.5

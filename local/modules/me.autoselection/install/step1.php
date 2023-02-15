@@ -36,11 +36,9 @@ global $APPLICATION;
                 <?php foreach ($arSites as $site): ?>
                     <div class="adm-detail-content-item-block">
                         <label for="$site['LID']"><?= $site['NAME'] ?></label>
-                        <input type="checkbox" name="<?= $site['LID'] ?>" value="<?= $site['LID'] ?>">
+                        <input type="checkbox" name="<?= $site['LID'] ?>" value="<?= $site['LID'] ?>" checked>
                     </div>
                 <?php endforeach; ?>
-                <label for="site"><?= $site['NAME'] ?></label>
-                <input type="checkbox" name="site" value="s2">
                 <input type="submit" name="" value="Выбрать">
             </div>
         </form>

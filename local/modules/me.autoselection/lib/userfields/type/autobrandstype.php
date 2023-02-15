@@ -2,16 +2,11 @@
 
 namespace Me\Autoselection\UserFields\Type;
 
-use Bitrix\Main\Diag\Debug;
-use Bitrix\Main\Loader;
-use Bitrix\Main\SystemException;
-use Bitrix\Main\UserField\Types\BaseType;
 use Bitrix\Main\Localization\Loc;
+use Bitrix\Main\UserField\Types\StringType;
 use CUserTypeManager;
-use Bitrix\Main\UserField\Types\EnumType;
-use Me\Autoselection\Helpers\HighloadBlock;
 
-class AutobrandsType extends EnumType
+class AutobrandsType extends StringType
 {
     public const
         USER_TYPE_ID = 'autobrands',
@@ -26,7 +21,7 @@ class AutobrandsType extends EnumType
         return [
             'CLASS_NAME' => __CLASS__,
             'DESCRIPTION' => Loc::getMessage('PROPERTY_TITLE'),
-            'BASE_TYPE' => CUserTypeManager::BASE_TYPE_ENUM
+            'BASE_TYPE' => CUserTypeManager::BASE_TYPE_STRING
         ];
     }
 
@@ -34,20 +29,6 @@ class AutobrandsType extends EnumType
      * Указывает тип данных в БД для данного тип пользовтельского поля
      * @return string
      */
-    public static function getDbColumnType(): string
-    {
-        global $DB;
-        switch (strtolower($DB->type)) {
-            case "mysql":
-                return "int(18)";
-            case "oracle":
-                return "number(18)";
-            case "mssql":
-                return "int";
-        }
-        return "int";
-    }
-
     /**
      * Метод возвращающий массив с параметрами экземпляра пользовательского поля к привязанному объекту
      * @param array $userField
@@ -104,17 +85,17 @@ class AutobrandsType extends EnumType
         return '';
     }
 
-//    /**
-//     * Вывод HTML-кода в форме редактирование значений в административной части
-//     * @param $arUserField
-//     * @param $arHtmlControl
-//     * @return array
-//     */
-//    public static function getEditFormHtml(array $userField, ?array $additionalParameters): string
-//    {
-//        return parent::getEditFormHtml($userField, $additionalParameters);
-//    }
-//
+    /**
+     * Вывод HTML-кода в форме редактирование значений в административной части
+     * @param $arUserField
+     * @param $arHtmlControl
+     * @return array
+     */
+    public static function getEditFormHtml(array $userField, ?array $additionalParameters): string
+    {
+        return parent::getEditFormHtml($userField, $additionalParameters);
+    }
+
 //    /**
 //     * Вывод HTML-кода в форме редактирование значений в фильтре
 //     * @param $arUserField
@@ -154,4 +135,5 @@ class AutobrandsType extends EnumType
     {
         return $value;
     }
+
 }

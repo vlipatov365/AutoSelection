@@ -2,10 +2,9 @@
 
 namespace Me\AutoSelection\Migrations;
 
-
-use Bitrix\Main\Diag\Debug;
+use Bitrix\Main\Loader;
 use Bitrix\Main\Localization\Loc;
-use Bitrix\Main\SiteTable;
+use CIBlockElement;
 use Me\AutoSelection\Helpers;
 use Me\AutoSelection\Helper;
 
@@ -31,7 +30,8 @@ class Iblock
                 'VERSION' => '1',
                 'DESCRIPTION' => '',
                 'WORKFLOW' => 'N',
-                'BIZPROC' => 'Y'
+                'BIZPROC' => 'N',
+                'EDIT_FILE_AFTER' => '/local/public/me/autoselection/form_edit.php'
             ];
             //TODO определить какие поля надо создать.
             $iblockId = Helpers\Iblock::createIblock($arFields);
@@ -61,7 +61,7 @@ class Iblock
         }
     }
 
-    protected static function fieldDefaultSettings() :array
+    protected static function fieldDefaultSettings(): array
     {
         return [
             'IS_REQUIRED' => 'Y',
@@ -74,11 +74,13 @@ class Iblock
                 'ADD_READ_ONLY_FIELD' => 'N',
                 'EDIT_READ_ONLY_FIELD' => 'N',
                 'SHOW_FIELD_PREVIEW' => 'N',
-            ]
+            ],
+            'LIST' => [],
+            'SEARCHABLE' => 'Y'
         ];
     }
 
-    protected static function newFields() :array
+    protected static function newFields(): array
     {
         $newFields = [];
         $newFieldProperties = [
@@ -94,7 +96,7 @@ class Iblock
         return $newFields;
     }
 
-    protected static function fieldBrand() :array
+    protected static function fieldBrand(): array
     {
         return [
             'SORT' => 20,
@@ -104,7 +106,7 @@ class Iblock
         ];
     }
 
-    protected static function fieldCondition() :array
+    protected static function fieldCondition(): array
     {
         return [
             'SORT' => 30,
@@ -114,7 +116,7 @@ class Iblock
         ];
     }
 
-    protected static function fieldYear() :array
+    protected static function fieldYear(): array
     {
         return [
             'SORT' => 40,
@@ -124,7 +126,7 @@ class Iblock
         ];
     }
 
-    protected static function fieldPrice() :array
+    protected static function fieldPrice(): array
     {
         return [
             'SORT' => 50,
@@ -134,7 +136,7 @@ class Iblock
         ];
     }
 
-    protected static function fieldRainSensor() :array
+    protected static function fieldRainSensor(): array
     {
         return [
             'SORT' => 60,
@@ -142,5 +144,79 @@ class Iblock
             'CODE' => 'RAINSENS',
             'TYPE' => 'S'
         ];
+    }
+
+    public static function addElements()
+    {
+        Loader::includeModule('me.autoselection');
+        $PROPS = [];
+        $iblockId = Helpers\Iblock::getIblockId(['CODE' => 'me_autoselection']);
+        $properties = CIBlockElement::GetProperty($iblockId, []);
+        while ($property = $properties->Fetch()) {
+            $PROPS[$property['CODE']] = $property['ID'];
+        }
+
+        $properties = CIBlockElement::GetProperty($iblockId, []);
+        $arProps = [
+            [
+                'NAME' => 'А8',
+                $PROPS['BRAND'] => 'Audi',
+                $PROPS['CONDITION'] => 'Поддержанный',
+                $PROPS['YEAR'] => 2003,
+                $PROPS['PRICE'] => 300000,
+                $PROPS['RAINSENS'] => 'Да'
+            ],
+            [
+                'NAME' => 'M3',
+                $PROPS['BRAND'] => 'BMW',
+                $PROPS['CONDITION'] => 'Поддержанный',
+                $PROPS['YEAR'] => 2010,
+                $PROPS['PRICE'] => 450000,
+                $PROPS['RAINSENS'] => 'Нет'
+            ],
+            [
+                'NAME' => 'Outback',
+                $PROPS['BRAND'] => 'Subaru',
+                $PROPS['CONDITION'] => 'Новое',
+                $PROPS['YEAR'] => 2023,
+                $PROPS['PRICE'] => 44450000,
+                $PROPS['RAINSENS'] => 'Да'
+            ],
+            [
+                'NAME' => 'Model S',
+                $PROPS['BRAND'] => 'Tesla',
+                $PROPS['CONDITION'] => 'Новое',
+                $PROPS['YEAR'] => 2022,
+                $PROPS['PRICE'] => 50000000,
+                $PROPS['RAINSENS'] => 'Нет'
+            ],
+            [
+                'NAME' => 'XV',
+                $PROPS['BRAND'] => 'Subaru',
+                $PROPS['CONDITION'] => 'Поддержанный',
+                $PROPS['YEAR'] => 2013,
+                $PROPS['PRICE'] => 12450000,
+                $PROPS['RAINSENS'] => 'Нет'
+            ],
+            [
+                'NAME' => 'X6',
+                $PROPS['BRAND'] => 'BMW',
+                $PROPS['CONDITION'] => 'Поддержанный',
+                $PROPS['YEAR'] => 2007,
+                $PROPS['PRICE'] => 1150000,
+                $PROPS['RAINSENS'] => 'Нет'
+            ],
+        ];
+
+        foreach ($arProps as $props) {
+            $arFields = [
+                'IBLOCK_ID' => $iblockId,
+                "IBLOCK_SECTION_ID" => false,
+                "PROPERTY_VALUES" => $props,
+                'NAME' => $props['NAME']
+            ];
+            $el = new CIBlockElement();
+            $el->Add($arFields);
+        }
     }
 }
