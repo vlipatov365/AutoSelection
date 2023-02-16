@@ -9,96 +9,96 @@ use Bitrix\Catalog;
 use Me\AutoSelection\Helpers;
 global $APPLICATION, $USER;
 
-	$nameFormat = CSite::GetNameFormat();
+$nameFormat = CSite::GetNameFormat();
 
-	$tabControl->BeginPrologContent();
-	CJSCore::Init(array('date'));
+$tabControl->BeginPrologContent();
+CJSCore::Init(array('date'));
 
-	//TODO: this code only for old html editor. Need remove after final cut old editor
-	if (
-        $bFileman
-        && (string)Main\Config\Option::get('iblock', 'use_htmledit') == 'Y'
-        && (string)Main\Config\Option::get('fileman', 'use_editor_3', 'Y') != 'Y'
-    )
-    {
-        echo '<div style="display:none">';
-        CFileMan::AddHTMLEditorFrame("SOME_TEXT", "", "SOME_TEXT_TYPE", "text",
-            array('height' => 450, 'width' => '100%'),
-            "N", 0, "", "", $arIBlock["LID"]
-        );
-        echo '</div>';
-    }
+//TODO: this code only for old html editor. Need remove after final cut old editor
+if (
+    $bFileman
+    && (string)Main\Config\Option::get('iblock', 'use_htmledit') == 'Y'
+    && (string)Main\Config\Option::get('fileman', 'use_editor_3', 'Y') != 'Y'
+)
+{
+    echo '<div style="display:none">';
+    CFileMan::AddHTMLEditorFrame("SOME_TEXT", "", "SOME_TEXT_TYPE", "text",
+        array('height' => 450, 'width' => '100%'),
+        "N", 0, "", "", $arIBlock["LID"]
+    );
+    echo '</div>';
+}
 
-	if($arTranslit["TRANSLITERATION"] == "Y")
-    {
-        CJSCore::Init(array('translit'));
-        ?>
-        <script type="text/javascript">
-            var linked=<?if($bLinked) echo 'true'; else echo 'false';?>;
-            function set_linked()
-            {
-                linked=!linked;
+if($arTranslit["TRANSLITERATION"] == "Y")
+{
+    CJSCore::Init(array('translit'));
+    ?>
+    <script type="text/javascript">
+        var linked=<?if($bLinked) echo 'true'; else echo 'false';?>;
+        function set_linked()
+        {
+            linked=!linked;
 
-                var name_link = document.getElementById('name_link');
-                if(name_link)
-                {
-                    if(linked)
-                        name_link.src='/bitrix/themes/.default/icons/iblock/link.gif';
-                    else
-                        name_link.src='/bitrix/themes/.default/icons/iblock/unlink.gif';
-                }
-                var code_link = document.getElementById('code_link');
-                if(code_link)
-                {
-                    if(linked)
-                        code_link.src='/bitrix/themes/.default/icons/iblock/link.gif';
-                    else
-                        code_link.src='/bitrix/themes/.default/icons/iblock/unlink.gif';
-                }
-                var linked_state = document.getElementById('linked_state');
-                if(linked_state)
-                {
-                    if(linked)
-                        linked_state.value='Y';
-                    else
-                        linked_state.value='N';
-                }
-            }
-            var oldValue = '';
-            function transliterate()
+            var name_link = document.getElementById('name_link');
+            if(name_link)
             {
                 if(linked)
+                    name_link.src='/bitrix/themes/.default/icons/iblock/link.gif';
+                else
+                    name_link.src='/bitrix/themes/.default/icons/iblock/unlink.gif';
+            }
+            var code_link = document.getElementById('code_link');
+            if(code_link)
+            {
+                if(linked)
+                    code_link.src='/bitrix/themes/.default/icons/iblock/link.gif';
+                else
+                    code_link.src='/bitrix/themes/.default/icons/iblock/unlink.gif';
+            }
+            var linked_state = document.getElementById('linked_state');
+            if(linked_state)
+            {
+                if(linked)
+                    linked_state.value='Y';
+                else
+                    linked_state.value='N';
+            }
+        }
+        var oldValue = '';
+        function transliterate()
+        {
+            if(linked)
+            {
+                var from = document.getElementById('NAME');
+                var to = document.getElementById('CODE');
+                if(from && to && oldValue != from.value)
                 {
-                    var from = document.getElementById('NAME');
-                    var to = document.getElementById('CODE');
-                    if(from && to && oldValue != from.value)
-                    {
-                        BX.translit(from.value, {
-                            'max_len' : <?echo intval($arTranslit['TRANS_LEN'])?>,
-                            'change_case' : '<?echo $arTranslit['TRANS_CASE']?>',
-                            'replace_space' : '<?echo $arTranslit['TRANS_SPACE']?>',
-                            'replace_other' : '<?echo $arTranslit['TRANS_OTHER']?>',
-                            'delete_repeat_replace' : <?echo $arTranslit['TRANS_EAT'] == 'Y'? 'true': 'false'?>,
-                            'use_google' : <?echo $arTranslit['USE_GOOGLE'] == 'Y'? 'true': 'false'?>,
-                            'callback' : function(result){to.value = result; setTimeout('transliterate()', 250); }
-                        });
-                        oldValue = from.value;
-                    }
-                    else
-                    {
-                        setTimeout('transliterate()', 250);
-                    }
+                    BX.translit(from.value, {
+                        'max_len' : <?echo intval($arTranslit['TRANS_LEN'])?>,
+                        'change_case' : '<?echo $arTranslit['TRANS_CASE']?>',
+                        'replace_space' : '<?echo $arTranslit['TRANS_SPACE']?>',
+                        'replace_other' : '<?echo $arTranslit['TRANS_OTHER']?>',
+                        'delete_repeat_replace' : <?echo $arTranslit['TRANS_EAT'] == 'Y'? 'true': 'false'?>,
+                        'use_google' : <?echo $arTranslit['USE_GOOGLE'] == 'Y'? 'true': 'false'?>,
+                        'callback' : function(result){to.value = result; setTimeout('transliterate()', 250); }
+                    });
+                    oldValue = from.value;
                 }
                 else
                 {
                     setTimeout('transliterate()', 250);
                 }
             }
-            transliterate();
-        </script>
-        <?
-    }
-	?>
+            else
+            {
+                setTimeout('transliterate()', 250);
+            }
+        }
+        transliterate();
+    </script>
+    <?
+}
+?>
     <script type="text/javascript">
         var InheritedPropertiesTemplates = new JCInheritedPropertiesTemplates(
             '<?echo $tabControl->GetName()?>_form',
@@ -111,9 +111,9 @@ global $APPLICATION, $USER;
         });
     </script>
 <?
-	$tabControl->EndPrologContent();
+$tabControl->EndPrologContent();
 
-	$tabControl->BeginEpilogContent();
+$tabControl->BeginEpilogContent();
 
 echo bitrix_sessid_post();
 echo GetFilterHiddens("find_");?>
@@ -162,15 +162,15 @@ $tabControl->Begin(array(
 ));
 
 $tabControl->BeginNextFormTab();
-	if($ID > 0 && !$bCopy)
-    {
-        $p = CIblockElement::GetByID($ID);
-        $pr = $p->ExtractFields("prn_");
-    }
-    else
-    {
-        $pr = array();
-    }
+if($ID > 0 && !$bCopy)
+{
+    $p = CIblockElement::GetByID($ID);
+    $pr = $p->ExtractFields("prn_");
+}
+else
+{
+    $pr = array();
+}
 
 if ($ID > 0 && !$bCopy)
 {
@@ -446,35 +446,35 @@ if(!empty($PROP)):
                 endif;?><?echo $tabControl->GetCustomLabelHTML();?>:</td>
             <td width="60%"><label for="new">Новое</label><input type="radio" id="new" value="Новое" name="<?='PROP['.$prop_fields["ID"].']'?>"><label for="rusty">Подержанный</label><input id="rusty" type="radio" value="Подержанный" name="<?='PROP['.$prop_fields["ID"].']'?>"></td>
         </tr>
-        <? elseif ($prop_fields['CODE'] == 'BRAND'):?>
+    <? elseif ($prop_fields['CODE'] == 'BRAND'):?>
         <tr id="tr_PROPERTY_<?echo $prop_fields["ID"];?>"<?if ($prop_fields["PROPERTY_TYPE"]=="F"):?> class="adm-detail-file-row"<?endif?>>
             <td class="adm-detail-valign-top" width="40%"><?if($prop_fields["HINT"]!=""):
                     ?><span id="hint_<?echo $prop_fields["ID"];?>"></span><script type="text/javascript">BX.hint_replace(BX('hint_<?echo $prop_fields["ID"];?>'), '<?echo CUtil::JSEscape(htmlspecialcharsbx($prop_fields["HINT"]))?>');</script>&nbsp;<?
                 endif;?><?echo $tabControl->GetCustomLabelHTML();?>:</td>
             <td width="60%"><?_ShowPropertyField('PROP['.$prop_fields["ID"].']', $prop_fields, $prop_fields["VALUE"], (($historyId <= 0) && (!$bVarsFromForm) && ($ID<=0) && (!$bPropertyAjax)), $bVarsFromForm||$bPropertyAjax, 50000, $tabControl->GetFormName(), $bCopy);?></td>
         </tr>
-        <? elseif ($prop_fields['CODE'] == 'YEAR') :?>
+    <? elseif ($prop_fields['CODE'] == 'YEAR') :?>
         <tr id="tr_PROPERTY_<?echo $prop_fields["ID"];?>"<?if ($prop_fields["PROPERTY_TYPE"]=="F"):?> class="adm-detail-file-row"<?endif?>>
             <td class="adm-detail-valign-top" width="40%"><?if($prop_fields["HINT"]!=""):
                     ?><span id="hint_<?echo $prop_fields["ID"];?>"></span><script type="text/javascript">BX.hint_replace(BX('hint_<?echo $prop_fields["ID"];?>'), '<?echo CUtil::JSEscape(htmlspecialcharsbx($prop_fields["HINT"]))?>');</script>&nbsp;<?
                 endif;?><?echo $tabControl->GetCustomLabelHTML();?>:</td>
             <td width="60%"><?_ShowPropertyField('PROP['.$prop_fields["ID"].']', $prop_fields, $prop_fields["VALUE"], (($historyId <= 0) && (!$bVarsFromForm) && ($ID<=0) && (!$bPropertyAjax)), $bVarsFromForm||$bPropertyAjax, 50000, $tabControl->GetFormName(), $bCopy);?></td>
         </tr>
-        <? elseif ($prop_fields['CODE'] == 'PRICE') :?>
+    <? elseif ($prop_fields['CODE'] == 'PRICE') :?>
         <tr id="tr_PROPERTY_<?echo $prop_fields["ID"];?>"<?if ($prop_fields["PROPERTY_TYPE"]=="F"):?> class="adm-detail-file-row"<?endif?>>
             <td class="adm-detail-valign-top" width="40%"><?if($prop_fields["HINT"]!=""):
                     ?><span id="hint_<?echo $prop_fields["ID"];?>"></span><script type="text/javascript">BX.hint_replace(BX('hint_<?echo $prop_fields["ID"];?>'), '<?echo CUtil::JSEscape(htmlspecialcharsbx($prop_fields["HINT"]))?>');</script>&nbsp;<?
                 endif;?><?echo $tabControl->GetCustomLabelHTML();?>:</td>
             <td width="60%"><?_ShowPropertyField('PROP['.$prop_fields["ID"].']', $prop_fields, $prop_fields["VALUE"], (($historyId <= 0) && (!$bVarsFromForm) && ($ID<=0) && (!$bPropertyAjax)), $bVarsFromForm||$bPropertyAjax, 50000, $tabControl->GetFormName(), $bCopy);?></td>
         </tr>
-        <? elseif ($prop_fields['CODE'] == 'RAINSENS') :?>
+    <? elseif ($prop_fields['CODE'] == 'RAINSENS') :?>
         <tr id="tr_PROPERTY_<?echo $prop_fields["ID"];?>"<?if ($prop_fields["PROPERTY_TYPE"]=="F"):?> class="adm-detail-file-row"<?endif?>>
             <td class="adm-detail-valign-top" width="40%"><?if($prop_fields["HINT"]!=""):
                     ?><span id="hint_<?echo $prop_fields["ID"];?>"></span><script type="text/javascript">BX.hint_replace(BX('hint_<?echo $prop_fields["ID"];?>'), '<?echo CUtil::JSEscape(htmlspecialcharsbx($prop_fields["HINT"]))?>');</script>&nbsp;<?
                 endif;?><?echo $tabControl->GetCustomLabelHTML();?>:</td>
             <td width="60%"><label for="yes">Есть</label><input type="radio" id="yes" value="Есть" name="<?='PROP['.$prop_fields["ID"].']'?>"><label for="not">Нет</label><input id="not" type="radio" value="Нет" name="<?='PROP['.$prop_fields["ID"].']'?>"></td>
         </tr>
-        <? endif; ?>
+    <? endif; ?>
         <?
         $hidden = "";
         if(!is_array($prop_fields["~VALUE"]))
@@ -505,48 +505,48 @@ if(!empty($PROP)):
     endforeach;?>
 <?endif;
 
-	if (!$bAutocomplete && ($ID > 0 && !$bCopy))
+if (!$bAutocomplete && ($ID > 0 && !$bCopy))
+{
+    $rsLinkedProps = CIBlockProperty::GetList(array(), array(
+        "PROPERTY_TYPE" => "E",
+        "LINK_IBLOCK_ID" => $IBLOCK_ID,
+        "ACTIVE" => "Y",
+        "FILTRABLE" => "Y",
+    ));
+    $arLinkedProp = $rsLinkedProps->GetNext();
+    if ($arLinkedProp && !$adminSidePanelHelper->isPublicSidePanel())
     {
-        $rsLinkedProps = CIBlockProperty::GetList(array(), array(
-            "PROPERTY_TYPE" => "E",
-            "LINK_IBLOCK_ID" => $IBLOCK_ID,
-            "ACTIVE" => "Y",
-            "FILTRABLE" => "Y",
-        ));
-        $arLinkedProp = $rsLinkedProps->GetNext();
-        if ($arLinkedProp && !$adminSidePanelHelper->isPublicSidePanel())
+        $linkedTitle = '';
+        $tabControl->BeginCustomField("LINKED_PROP", GetMessage("IBLOCK_ELEMENT_EDIT_LINKED"));
+        ?>
+        <tr class="heading" id="tr_LINKED_PROP">
+            <td colspan="2"><?echo $tabControl->GetCustomLabelHTML();?></td>
+        </tr>
+        <?
+        if (defined('BX_PUBLIC_MODE') && BX_PUBLIC_MODE == 1)
+            $linkedTitle = htmlspecialcharsbx(GetMessage('IBLOCK_LINKED_ELEMENT_TITLE'));
+        do
         {
-            $linkedTitle = '';
-            $tabControl->BeginCustomField("LINKED_PROP", GetMessage("IBLOCK_ELEMENT_EDIT_LINKED"));
-            ?>
-            <tr class="heading" id="tr_LINKED_PROP">
-                <td colspan="2"><?echo $tabControl->GetCustomLabelHTML();?></td>
-            </tr>
+            $elements_name = (string)CIBlock::GetArrayByID($arLinkedProp["IBLOCK_ID"], "ELEMENTS_NAME");
+            if ($elements_name == '')
+                $elements_name = GetMessage("IBLOCK_ELEMENT_EDIT_ELEMENTS");
+            ?><tr id="tr_LINKED_PROP<?echo $arLinkedProp["ID"]?>">
             <?
-            if (defined('BX_PUBLIC_MODE') && BX_PUBLIC_MODE == 1)
-                $linkedTitle = htmlspecialcharsbx(GetMessage('IBLOCK_LINKED_ELEMENT_TITLE'));
-            do
-            {
-                $elements_name = (string)CIBlock::GetArrayByID($arLinkedProp["IBLOCK_ID"], "ELEMENTS_NAME");
-                if ($elements_name == '')
-                    $elements_name = GetMessage("IBLOCK_ELEMENT_EDIT_ELEMENTS");
-                ?><tr id="tr_LINKED_PROP<?echo $arLinkedProp["ID"]?>">
-                <?
-                $href = $selfFolderUrl.htmlspecialcharsbx(CIBlock::GetAdminElementListLink($arLinkedProp["IBLOCK_ID"],
-                        array('apply_filter'=>'Y', 'PROPERTY_'.$arLinkedProp["ID"]=>$ID, 'find_section_section' => -1)));
-                ?>
-                <td colspan="2">
-                    <a title="<?=$linkedTitle; ?>" href="<?=$href?>">
-                        <?=htmlspecialcharsbx(CIBlock::GetArrayByID($arLinkedProp["IBLOCK_ID"], "NAME").": ".$elements_name);?>
-                    </a>
-                </td>
-                </tr><?
-            }
-            while ($arLinkedProp = $rsLinkedProps->GetNext());
-            unset($linkedTitle);
-            $tabControl->EndCustomField("LINKED_PROP", "");
+            $href = $selfFolderUrl.htmlspecialcharsbx(CIBlock::GetAdminElementListLink($arLinkedProp["IBLOCK_ID"],
+                    array('apply_filter'=>'Y', 'PROPERTY_'.$arLinkedProp["ID"]=>$ID, 'find_section_section' => -1)));
+            ?>
+            <td colspan="2">
+                <a title="<?=$linkedTitle; ?>" href="<?=$href?>">
+                    <?=htmlspecialcharsbx(CIBlock::GetArrayByID($arLinkedProp["IBLOCK_ID"], "NAME").": ".$elements_name);?>
+                </a>
+            </td>
+            </tr><?
         }
+        while ($arLinkedProp = $rsLinkedProps->GetNext());
+        unset($linkedTitle);
+        $tabControl->EndCustomField("LINKED_PROP", "");
     }
+}
 
 $tabControl->BeginNextFormTab();
 $tabControl->BeginCustomField("PREVIEW_PICTURE", GetMessage("IBLOCK_FIELD_PREVIEW_PICTURE"), $arIBlock["FIELDS"]["PREVIEW_PICTURE"]["IS_REQUIRED"] === "Y");
@@ -759,134 +759,134 @@ $tabControl->EndCustomField("DETAIL_TEXT",
     '<input type="hidden" name="DETAIL_TEXT" value="'.$str_DETAIL_TEXT.'">'.
     '<input type="hidden" name="DETAIL_TEXT_TYPE" value="'.$str_DETAIL_TEXT_TYPE.'">'
 );
-	$tabControl->BeginNextFormTab();
-	?>
-	<?
-	$tabControl->BeginCustomField("IPROPERTY_TEMPLATES_ELEMENT_META_TITLE", GetMessage("IBEL_E_SEO_META_TITLE"));
-	?>
+$tabControl->BeginNextFormTab();
+?>
+<?
+$tabControl->BeginCustomField("IPROPERTY_TEMPLATES_ELEMENT_META_TITLE", GetMessage("IBEL_E_SEO_META_TITLE"));
+?>
     <tr class="adm-detail-valign-top">
         <td width="40%"><?echo $tabControl->GetCustomLabelHTML()?></td>
         <td width="60%"><?echo IBlockInheritedPropertyInput($IBLOCK_ID, "ELEMENT_META_TITLE", $str_IPROPERTY_TEMPLATES, "E", GetMessage("IBEL_E_SEO_OVERWRITE"))?></td>
     </tr>
 <?
-	$tabControl->EndCustomField("IPROPERTY_TEMPLATES_ELEMENT_META_TITLE",
-        IBlockInheritedPropertyHidden($IBLOCK_ID, "ELEMENT_META_TITLE", $str_IPROPERTY_TEMPLATES, "E", GetMessage("IBEL_E_SEO_OVERWRITE"))
-    );
-	?>
-	<?
-	$tabControl->BeginCustomField("IPROPERTY_TEMPLATES_ELEMENT_META_KEYWORDS", GetMessage("IBEL_E_SEO_META_KEYWORDS"));
-	?>
+$tabControl->EndCustomField("IPROPERTY_TEMPLATES_ELEMENT_META_TITLE",
+    IBlockInheritedPropertyHidden($IBLOCK_ID, "ELEMENT_META_TITLE", $str_IPROPERTY_TEMPLATES, "E", GetMessage("IBEL_E_SEO_OVERWRITE"))
+);
+?>
+<?
+$tabControl->BeginCustomField("IPROPERTY_TEMPLATES_ELEMENT_META_KEYWORDS", GetMessage("IBEL_E_SEO_META_KEYWORDS"));
+?>
     <tr class="adm-detail-valign-top">
         <td width="40%"><?echo $tabControl->GetCustomLabelHTML()?></td>
         <td width="60%"><?echo IBlockInheritedPropertyInput($IBLOCK_ID, "ELEMENT_META_KEYWORDS", $str_IPROPERTY_TEMPLATES, "E", GetMessage("IBEL_E_SEO_OVERWRITE"))?></td>
     </tr>
 <?
-	$tabControl->EndCustomField("IPROPERTY_TEMPLATES_ELEMENT_META_KEYWORDS",
-        IBlockInheritedPropertyHidden($IBLOCK_ID, "ELEMENT_META_KEYWORDS", $str_IPROPERTY_TEMPLATES, "E", GetMessage("IBEL_E_SEO_OVERWRITE"))
-    );
-	?>
-	<?
-	$tabControl->BeginCustomField("IPROPERTY_TEMPLATES_ELEMENT_META_DESCRIPTION", GetMessage("IBEL_E_SEO_META_DESCRIPTION"));
-	?>
+$tabControl->EndCustomField("IPROPERTY_TEMPLATES_ELEMENT_META_KEYWORDS",
+    IBlockInheritedPropertyHidden($IBLOCK_ID, "ELEMENT_META_KEYWORDS", $str_IPROPERTY_TEMPLATES, "E", GetMessage("IBEL_E_SEO_OVERWRITE"))
+);
+?>
+<?
+$tabControl->BeginCustomField("IPROPERTY_TEMPLATES_ELEMENT_META_DESCRIPTION", GetMessage("IBEL_E_SEO_META_DESCRIPTION"));
+?>
     <tr class="adm-detail-valign-top">
         <td width="40%"><?echo $tabControl->GetCustomLabelHTML()?></td>
         <td width="60%"><?echo IBlockInheritedPropertyInput($IBLOCK_ID, "ELEMENT_META_DESCRIPTION", $str_IPROPERTY_TEMPLATES, "E", GetMessage("IBEL_E_SEO_OVERWRITE"))?></td>
     </tr>
 <?
-	$tabControl->EndCustomField("IPROPERTY_TEMPLATES_ELEMENT_META_DESCRIPTION",
-        IBlockInheritedPropertyHidden($IBLOCK_ID, "ELEMENT_META_DESCRIPTION", $str_IPROPERTY_TEMPLATES, "E", GetMessage("IBEL_E_SEO_OVERWRITE"))
-    );
-	?>
-	<?
-	$tabControl->BeginCustomField("IPROPERTY_TEMPLATES_ELEMENT_PAGE_TITLE", GetMessage("IBEL_E_SEO_ELEMENT_TITLE"));
-	?>
+$tabControl->EndCustomField("IPROPERTY_TEMPLATES_ELEMENT_META_DESCRIPTION",
+    IBlockInheritedPropertyHidden($IBLOCK_ID, "ELEMENT_META_DESCRIPTION", $str_IPROPERTY_TEMPLATES, "E", GetMessage("IBEL_E_SEO_OVERWRITE"))
+);
+?>
+<?
+$tabControl->BeginCustomField("IPROPERTY_TEMPLATES_ELEMENT_PAGE_TITLE", GetMessage("IBEL_E_SEO_ELEMENT_TITLE"));
+?>
     <tr class="adm-detail-valign-top">
         <td width="40%"><?echo $tabControl->GetCustomLabelHTML()?></td>
         <td width="60%"><?echo IBlockInheritedPropertyInput($IBLOCK_ID, "ELEMENT_PAGE_TITLE", $str_IPROPERTY_TEMPLATES, "E", GetMessage("IBEL_E_SEO_OVERWRITE"))?></td>
     </tr>
 <?
-	$tabControl->EndCustomField("IPROPERTY_TEMPLATES_ELEMENT_PAGE_TITLE",
-        IBlockInheritedPropertyHidden($IBLOCK_ID, "ELEMENT_PAGE_TITLE", $str_IPROPERTY_TEMPLATES, "E", GetMessage("IBEL_E_SEO_OVERWRITE"))
-    );
-	?>
-	<?
-	$tabControl->AddSection("IPROPERTY_TEMPLATES_ELEMENTS_PREVIEW_PICTURE", GetMessage("IBEL_E_SEO_FOR_ELEMENTS_PREVIEW_PICTURE"));
-	$tabControl->BeginCustomField("IPROPERTY_TEMPLATES_ELEMENT_PREVIEW_PICTURE_FILE_ALT", GetMessage("IBEL_E_SEO_FILE_ALT"));
-	?>
+$tabControl->EndCustomField("IPROPERTY_TEMPLATES_ELEMENT_PAGE_TITLE",
+    IBlockInheritedPropertyHidden($IBLOCK_ID, "ELEMENT_PAGE_TITLE", $str_IPROPERTY_TEMPLATES, "E", GetMessage("IBEL_E_SEO_OVERWRITE"))
+);
+?>
+<?
+$tabControl->AddSection("IPROPERTY_TEMPLATES_ELEMENTS_PREVIEW_PICTURE", GetMessage("IBEL_E_SEO_FOR_ELEMENTS_PREVIEW_PICTURE"));
+$tabControl->BeginCustomField("IPROPERTY_TEMPLATES_ELEMENT_PREVIEW_PICTURE_FILE_ALT", GetMessage("IBEL_E_SEO_FILE_ALT"));
+?>
     <tr class="adm-detail-valign-top">
         <td width="40%"><?echo $tabControl->GetCustomLabelHTML()?></td>
         <td width="60%"><?echo IBlockInheritedPropertyInput($IBLOCK_ID, "ELEMENT_PREVIEW_PICTURE_FILE_ALT", $str_IPROPERTY_TEMPLATES, "E", GetMessage("IBEL_E_SEO_OVERWRITE"))?></td>
     </tr>
 <?
-	$tabControl->EndCustomField("IPROPERTY_TEMPLATES_ELEMENT_PREVIEW_PICTURE_FILE_ALT",
-        IBlockInheritedPropertyHidden($IBLOCK_ID, "ELEMENT_PREVIEW_PICTURE_FILE_ALT", $str_IPROPERTY_TEMPLATES, "E", GetMessage("IBEL_E_SEO_OVERWRITE"))
-    );
-	?>
-	<?
-	$tabControl->BeginCustomField("IPROPERTY_TEMPLATES_ELEMENT_PREVIEW_PICTURE_FILE_TITLE", GetMessage("IBEL_E_SEO_FILE_TITLE"));
-	?>
+$tabControl->EndCustomField("IPROPERTY_TEMPLATES_ELEMENT_PREVIEW_PICTURE_FILE_ALT",
+    IBlockInheritedPropertyHidden($IBLOCK_ID, "ELEMENT_PREVIEW_PICTURE_FILE_ALT", $str_IPROPERTY_TEMPLATES, "E", GetMessage("IBEL_E_SEO_OVERWRITE"))
+);
+?>
+<?
+$tabControl->BeginCustomField("IPROPERTY_TEMPLATES_ELEMENT_PREVIEW_PICTURE_FILE_TITLE", GetMessage("IBEL_E_SEO_FILE_TITLE"));
+?>
     <tr class="adm-detail-valign-top">
         <td width="40%"><?echo $tabControl->GetCustomLabelHTML()?></td>
         <td width="60%"><?echo IBlockInheritedPropertyInput($IBLOCK_ID, "ELEMENT_PREVIEW_PICTURE_FILE_TITLE", $str_IPROPERTY_TEMPLATES, "E", GetMessage("IBEL_E_SEO_OVERWRITE"))?></td>
     </tr>
 <?
-	$tabControl->EndCustomField("IPROPERTY_TEMPLATES_ELEMENT_PREVIEW_PICTURE_FILE_TITLE",
-        IBlockInheritedPropertyHidden($IBLOCK_ID, "ELEMENT_PREVIEW_PICTURE_FILE_TITLE", $str_IPROPERTY_TEMPLATES, "E", GetMessage("IBEL_E_SEO_OVERWRITE"))
-    );
-	?>
-	<?
-	$tabControl->BeginCustomField("IPROPERTY_TEMPLATES_ELEMENT_PREVIEW_PICTURE_FILE_NAME", GetMessage("IBEL_E_SEO_FILE_NAME"));
-	?>
+$tabControl->EndCustomField("IPROPERTY_TEMPLATES_ELEMENT_PREVIEW_PICTURE_FILE_TITLE",
+    IBlockInheritedPropertyHidden($IBLOCK_ID, "ELEMENT_PREVIEW_PICTURE_FILE_TITLE", $str_IPROPERTY_TEMPLATES, "E", GetMessage("IBEL_E_SEO_OVERWRITE"))
+);
+?>
+<?
+$tabControl->BeginCustomField("IPROPERTY_TEMPLATES_ELEMENT_PREVIEW_PICTURE_FILE_NAME", GetMessage("IBEL_E_SEO_FILE_NAME"));
+?>
     <tr class="adm-detail-valign-top">
         <td width="40%"><?echo $tabControl->GetCustomLabelHTML()?></td>
         <td width="60%"><?echo IBlockInheritedPropertyInput($IBLOCK_ID, "ELEMENT_PREVIEW_PICTURE_FILE_NAME", $str_IPROPERTY_TEMPLATES, "E", GetMessage("IBEL_E_SEO_OVERWRITE"))?></td>
     </tr>
 <?
-	$tabControl->EndCustomField("IPROPERTY_TEMPLATES_ELEMENT_PREVIEW_PICTURE_FILE_NAME",
-        IBlockInheritedPropertyHidden($IBLOCK_ID, "ELEMENT_PREVIEW_PICTURE_FILE_NAME", $str_IPROPERTY_TEMPLATES, "E", GetMessage("IBEL_E_SEO_OVERWRITE"))
-    );
-	?>
-	<?
-	$tabControl->AddSection("IPROPERTY_TEMPLATES_ELEMENTS_DETAIL_PICTURE", GetMessage("IBEL_E_SEO_FOR_ELEMENTS_DETAIL_PICTURE"));
-	$tabControl->BeginCustomField("IPROPERTY_TEMPLATES_ELEMENT_DETAIL_PICTURE_FILE_ALT", GetMessage("IBEL_E_SEO_FILE_ALT"));
-	?>
+$tabControl->EndCustomField("IPROPERTY_TEMPLATES_ELEMENT_PREVIEW_PICTURE_FILE_NAME",
+    IBlockInheritedPropertyHidden($IBLOCK_ID, "ELEMENT_PREVIEW_PICTURE_FILE_NAME", $str_IPROPERTY_TEMPLATES, "E", GetMessage("IBEL_E_SEO_OVERWRITE"))
+);
+?>
+<?
+$tabControl->AddSection("IPROPERTY_TEMPLATES_ELEMENTS_DETAIL_PICTURE", GetMessage("IBEL_E_SEO_FOR_ELEMENTS_DETAIL_PICTURE"));
+$tabControl->BeginCustomField("IPROPERTY_TEMPLATES_ELEMENT_DETAIL_PICTURE_FILE_ALT", GetMessage("IBEL_E_SEO_FILE_ALT"));
+?>
     <tr class="adm-detail-valign-top">
         <td width="40%"><?echo $tabControl->GetCustomLabelHTML()?></td>
         <td width="60%"><?echo IBlockInheritedPropertyInput($IBLOCK_ID, "ELEMENT_DETAIL_PICTURE_FILE_ALT", $str_IPROPERTY_TEMPLATES, "E", GetMessage("IBEL_E_SEO_OVERWRITE"))?></td>
     </tr>
 <?
-	$tabControl->EndCustomField("IPROPERTY_TEMPLATES_ELEMENT_DETAIL_PICTURE_FILE_ALT",
-        IBlockInheritedPropertyHidden($IBLOCK_ID, "ELEMENT_DETAIL_PICTURE_FILE_ALT", $str_IPROPERTY_TEMPLATES, "E", GetMessage("IBEL_E_SEO_OVERWRITE"))
-    );
-	?>
-	<?
-	$tabControl->BeginCustomField("IPROPERTY_TEMPLATES_ELEMENT_DETAIL_PICTURE_FILE_TITLE", GetMessage("IBEL_E_SEO_FILE_TITLE"));
-	?>
+$tabControl->EndCustomField("IPROPERTY_TEMPLATES_ELEMENT_DETAIL_PICTURE_FILE_ALT",
+    IBlockInheritedPropertyHidden($IBLOCK_ID, "ELEMENT_DETAIL_PICTURE_FILE_ALT", $str_IPROPERTY_TEMPLATES, "E", GetMessage("IBEL_E_SEO_OVERWRITE"))
+);
+?>
+<?
+$tabControl->BeginCustomField("IPROPERTY_TEMPLATES_ELEMENT_DETAIL_PICTURE_FILE_TITLE", GetMessage("IBEL_E_SEO_FILE_TITLE"));
+?>
     <tr class="adm-detail-valign-top">
         <td width="40%"><?echo $tabControl->GetCustomLabelHTML()?></td>
         <td width="60%"><?echo IBlockInheritedPropertyInput($IBLOCK_ID, "ELEMENT_DETAIL_PICTURE_FILE_TITLE", $str_IPROPERTY_TEMPLATES, "E", GetMessage("IBEL_E_SEO_OVERWRITE"))?></td>
     </tr>
 <?
-	$tabControl->EndCustomField("IPROPERTY_TEMPLATES_ELEMENT_DETAIL_PICTURE_FILE_TITLE",
-        IBlockInheritedPropertyHidden($IBLOCK_ID, "ELEMENT_DETAIL_PICTURE_FILE_TITLE", $str_IPROPERTY_TEMPLATES, "E", GetMessage("IBEL_E_SEO_OVERWRITE"))
-    );
-	?>
-	<?
-	$tabControl->BeginCustomField("IPROPERTY_TEMPLATES_ELEMENT_DETAIL_PICTURE_FILE_NAME", GetMessage("IBEL_E_SEO_FILE_NAME"));
-	?>
+$tabControl->EndCustomField("IPROPERTY_TEMPLATES_ELEMENT_DETAIL_PICTURE_FILE_TITLE",
+    IBlockInheritedPropertyHidden($IBLOCK_ID, "ELEMENT_DETAIL_PICTURE_FILE_TITLE", $str_IPROPERTY_TEMPLATES, "E", GetMessage("IBEL_E_SEO_OVERWRITE"))
+);
+?>
+<?
+$tabControl->BeginCustomField("IPROPERTY_TEMPLATES_ELEMENT_DETAIL_PICTURE_FILE_NAME", GetMessage("IBEL_E_SEO_FILE_NAME"));
+?>
     <tr class="adm-detail-valign-top">
         <td width="40%"><?echo $tabControl->GetCustomLabelHTML()?></td>
         <td width="60%"><?echo IBlockInheritedPropertyInput($IBLOCK_ID, "ELEMENT_DETAIL_PICTURE_FILE_NAME", $str_IPROPERTY_TEMPLATES, "E", GetMessage("IBEL_E_SEO_OVERWRITE"))?></td>
     </tr>
 <?
-	$tabControl->EndCustomField("IPROPERTY_TEMPLATES_ELEMENT_DETAIL_PICTURE_FILE_NAME",
-        IBlockInheritedPropertyHidden($IBLOCK_ID, "ELEMENT_DETAIL_PICTURE_FILE_NAME", $str_IPROPERTY_TEMPLATES, "E", GetMessage("IBEL_E_SEO_OVERWRITE"))
-    );
-	?>
-	<?
-	$tabControl->AddSection("SEO_ADDITIONAL", GetMessage("IBLOCK_EL_TAB_MO"));
-	$tabControl->BeginCustomField("TAGS", GetMessage("IBLOCK_FIELD_TAGS").":", $arIBlock["FIELDS"]["TAGS"]["IS_REQUIRED"] === "Y");
-	?>
+$tabControl->EndCustomField("IPROPERTY_TEMPLATES_ELEMENT_DETAIL_PICTURE_FILE_NAME",
+    IBlockInheritedPropertyHidden($IBLOCK_ID, "ELEMENT_DETAIL_PICTURE_FILE_NAME", $str_IPROPERTY_TEMPLATES, "E", GetMessage("IBEL_E_SEO_OVERWRITE"))
+);
+?>
+<?
+$tabControl->AddSection("SEO_ADDITIONAL", GetMessage("IBLOCK_EL_TAB_MO"));
+$tabControl->BeginCustomField("TAGS", GetMessage("IBLOCK_FIELD_TAGS").":", $arIBlock["FIELDS"]["TAGS"]["IS_REQUIRED"] === "Y");
+?>
     <tr id="tr_TAGS">
         <td><?echo $tabControl->GetCustomLabelHTML()?><br><?echo GetMessage("IBLOCK_ELEMENT_EDIT_TAGS_TIP")?></td>
         <td>
@@ -902,11 +902,11 @@ $tabControl->EndCustomField("DETAIL_TEXT",
         </td>
     </tr>
 <?
-	$tabControl->EndCustomField("TAGS",
-        '<input type="hidden" name="TAGS" value="'.$str_TAGS.'">'
-    );
+$tabControl->EndCustomField("TAGS",
+    '<input type="hidden" name="TAGS" value="'.$str_TAGS.'">'
+);
 
-	?>
+?>
 
 <?if($arShowTabs['sections']):
     $tabControl->BeginNextFormTab();
@@ -1847,61 +1847,61 @@ while ($el = $hlBLockList->Fetch()) {
     $arBrands[$el['UF_BRANDNAME']] = $el['UF_BRANDNAME'];
 }
 ?>
-<!--<form name="add_my_ankete" action="--><?php //= $APPLICATION->GetCurPage() ?><!--" method="POST" enctype="multipart/form-data">-->
-<!--    <input type="hidden" value="list" name="type">-->
-<!--    <input type="hidden" value="--><?php //= $IblockId ?><!--" name="id">-->
-<!--    <input type="hidden" value="--><?php //=bitrix_sessid_get()?><!--" name="sessid">-->
-<!--    <input type="hidden" name="WF" value="N">-->
-<!--    <input type="hidden" name="from" value="iblock_list_admin">-->
-<!--    <input type="hidden" name="Update" value="Y">-->
-<!--    <input type="hidden" name="linked_state" id="linked_state" value="Y">-->
-<!--    <input type="hidden" name="set_filter" value="Y">-->
-<!--    <input type="hidden" name="filter" value="Y">-->
-<!--    <input type="hidden" name="return_url" value="">-->
-<!--    <input type="hidden" name="IBLOCK_SECTION_ID" value="0">-->
-<!--    <input type="hidden" name="TMP_ID" value="0">-->
-<!--    <div class="adm-detail-block">-->
-<!--        <div class="adm-detail-content-wrap">-->
-<!--            <div class="adm-detail-content" id="edit1">-->
-<!--                <div class="adm-detail-title">Добавить автомобиль</div>-->
-<!--                <div class="adm-detail-content-item-block">-->
-<!--                    <div style="display: flex; flex-direction: column">-->
-<!--                        --><?// foreach ($PROPS as $PROP): ?>
-<!--                            --><?php //if ($PROP['CODE'] == 'BRAND'): ?>
-<!--                                <div>-->
-<!--                                <label>--><?php //= $PROP['NAME'] ?><!--:</label>-->
-<!--                                <select style="max-width: 100px" id="BRAND">-->
-<!--                                    --><?// foreach ($arBrands as $brand): ?>
-<!--                                        <option>--><?php //= $brand ?><!--</option>-->
-<!--                                </div>-->
-<!--                                    --><?// endforeach; ?>
-<!--                                </select>-->
-<!--                            --><?// elseif ($PROP['CODE'] == 'CONDITION'): ?>
-<!--                                <label>--><?php //= $PROP['NAME'] ?><!--:</label>-->
-<!--                                Новый<input type="radio" value="--><?php //= $PROP['ID'] ?><!--" name="Новый">-->
-<!--                                Поддержаный<input type="radio" value="--><?php //= $PROP['ID'] ?><!--" name="Поддержаный">-->
-<!--                            --><?// elseif ($PROP['CODE'] == 'YEAR'): ?>
-<!--                                <label>--><?php //= $PROP['NAME'] ?><!--:</label>-->
-<!--                                <input type="number" value="">-->
-<!--                            --><?// elseif ($PROP['CODE'] == 'PRICE'): ?>
-<!--                                <label>--><?php //= $PROP['NAME'] ?><!--:</label>-->
-<!--                                <input type="number" value="">-->
-<!--                            --><?// elseif ($PROP['CODE'] == 'RAINSENS'): ?>
-<!--                                <label>--><?php //= $PROP['NAME'] ?><!--:</label>-->
-<!--                                Есть<input type="checkbox" value="Есть" name="--><?php //= $PROP['CODE'] ?><!--">-->
-<!--                                Нет<input type="checkbox" value="Нет" name="--><?php //= $PROP['CODE'] ?><!--">-->
-<!--                            --><?// endif; ?>
-<!--                        --><?// endforeach; ?>
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--            <div class="adm-detail-content">-->
-<!--                <input type="submit" class="adm-btn-save" name="save" id="save" value="Сохранить">-->
-<!--                <input type="submit" class="button" name="apply" id="apply" value="Применить">-->
-<!--                <input type="submit" class="button" name="dontsave" id="dontsave" value="Отменить">-->
-<!--            </div>-->
-<!--        </div>-->
-<!--        <br>-->
-<!--    </div>-->
-<!--</form>-->
+    <!--<form name="add_my_ankete" action="--><?php //= $APPLICATION->GetCurPage() ?><!--" method="POST" enctype="multipart/form-data">-->
+    <!--    <input type="hidden" value="list" name="type">-->
+    <!--    <input type="hidden" value="--><?php //= $IblockId ?><!--" name="id">-->
+    <!--    <input type="hidden" value="--><?php //=bitrix_sessid_get()?><!--" name="sessid">-->
+    <!--    <input type="hidden" name="WF" value="N">-->
+    <!--    <input type="hidden" name="from" value="iblock_list_admin">-->
+    <!--    <input type="hidden" name="Update" value="Y">-->
+    <!--    <input type="hidden" name="linked_state" id="linked_state" value="Y">-->
+    <!--    <input type="hidden" name="set_filter" value="Y">-->
+    <!--    <input type="hidden" name="filter" value="Y">-->
+    <!--    <input type="hidden" name="return_url" value="">-->
+    <!--    <input type="hidden" name="IBLOCK_SECTION_ID" value="0">-->
+    <!--    <input type="hidden" name="TMP_ID" value="0">-->
+    <!--    <div class="adm-detail-block">-->
+    <!--        <div class="adm-detail-content-wrap">-->
+    <!--            <div class="adm-detail-content" id="edit1">-->
+    <!--                <div class="adm-detail-title">Добавить автомобиль</div>-->
+    <!--                <div class="adm-detail-content-item-block">-->
+    <!--                    <div style="display: flex; flex-direction: column">-->
+    <!--                        --><?// foreach ($PROPS as $PROP): ?>
+    <!--                            --><?php //if ($PROP['CODE'] == 'BRAND'): ?>
+    <!--                                <div>-->
+    <!--                                <label>--><?php //= $PROP['NAME'] ?><!--:</label>-->
+    <!--                                <select style="max-width: 100px" id="BRAND">-->
+    <!--                                    --><?// foreach ($arBrands as $brand): ?>
+    <!--                                        <option>--><?php //= $brand ?><!--</option>-->
+    <!--                                </div>-->
+    <!--                                    --><?// endforeach; ?>
+    <!--                                </select>-->
+    <!--                            --><?// elseif ($PROP['CODE'] == 'CONDITION'): ?>
+    <!--                                <label>--><?php //= $PROP['NAME'] ?><!--:</label>-->
+    <!--                                Новый<input type="radio" value="--><?php //= $PROP['ID'] ?><!--" name="Новый">-->
+    <!--                                Поддержаный<input type="radio" value="--><?php //= $PROP['ID'] ?><!--" name="Поддержаный">-->
+    <!--                            --><?// elseif ($PROP['CODE'] == 'YEAR'): ?>
+    <!--                                <label>--><?php //= $PROP['NAME'] ?><!--:</label>-->
+    <!--                                <input type="number" value="">-->
+    <!--                            --><?// elseif ($PROP['CODE'] == 'PRICE'): ?>
+    <!--                                <label>--><?php //= $PROP['NAME'] ?><!--:</label>-->
+    <!--                                <input type="number" value="">-->
+    <!--                            --><?// elseif ($PROP['CODE'] == 'RAINSENS'): ?>
+    <!--                                <label>--><?php //= $PROP['NAME'] ?><!--:</label>-->
+    <!--                                Есть<input type="checkbox" value="Есть" name="--><?php //= $PROP['CODE'] ?><!--">-->
+    <!--                                Нет<input type="checkbox" value="Нет" name="--><?php //= $PROP['CODE'] ?><!--">-->
+    <!--                            --><?// endif; ?>
+    <!--                        --><?// endforeach; ?>
+    <!--                    </div>-->
+    <!--                </div>-->
+    <!--            </div>-->
+    <!--            <div class="adm-detail-content">-->
+    <!--                <input type="submit" class="adm-btn-save" name="save" id="save" value="Сохранить">-->
+    <!--                <input type="submit" class="button" name="apply" id="apply" value="Применить">-->
+    <!--                <input type="submit" class="button" name="dontsave" id="dontsave" value="Отменить">-->
+    <!--            </div>-->
+    <!--        </div>-->
+    <!--        <br>-->
+    <!--    </div>-->
+    <!--</form>-->
 <?php

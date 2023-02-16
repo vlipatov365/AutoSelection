@@ -58,18 +58,16 @@ class me_autoselection extends CModule
             foreach ($arSites as $site) {
 
                 if ($site['LID'] = $this->REQUEST[$site['LID']]) {
-                    $arSitesToInstall [] = [
-                        $site['LID']
-                    ];
+                    $arSitesToInstall [] = $site['LID'];
                 }
                 foreach ($arSitesToInstall as $siteToInstall) {
                     $this->InstallHlBlock($siteToInstall);
+                    $this->InstallEvents();
                     $this->InstallIblock($siteToInstall);
                     $this->addElements();
                 }
             }
             $this->InstallFiles();
-            $this->InstallEvents();
         }
     }
 
@@ -132,7 +130,7 @@ class me_autoselection extends CModule
         /**Установка события для добавления кнопки меню*/
         $eventManager->registerEventHandler(
             'main',
-            'BeforeProlog',
+            'OnPageStart',
             $this->MODULE_ID,
             'Me\AutoSelection\Handlers\BuildOnBeforeProlog',
             'bootstrapOn'

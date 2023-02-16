@@ -4,25 +4,21 @@ namespace Me\AutoSelection\Migrations;
 
 use Bitrix\Highloadblock\HighloadBlockLangTable;
 use Bitrix\Highloadblock\HighloadBlockTable;
-use Bitrix\Main\Diag\Debug;
-use Bitrix\Main\SystemException;
 use Bitrix\Main\Localization\Loc;
+use Bitrix\Main\SystemException;
 use Me\Autoselection\Helpers;
 use Me\AutoSelection\Helper;
 
 class HlBlock
 {
-    public function getHlBlockName()
-    {
-        return "MeAutoSelectionBrands";
-    }
+    const HL_BLOCK_NAME = "MeAutoSelectionBrands";
 
     public static function up($site)
     {
         Helper::initModules(['highloadblock']);
 
         $exists = Helpers\HighloadBlock::getHlblock(
-            ['NAME' => self::getHlBlockName()],
+            ['NAME' => self::HL_BLOCK_NAME],
             ['ID']
         );
         if (empty($exists)) {
@@ -126,13 +122,13 @@ class HlBlock
         return $arFields;
     }
 
-    function addUserTypeEntity($field)
+    static function addUserTypeEntity($field)
     {
         $obUserField = new \CUserTypeEntity;
         $obUserField->Add($field);
     }
 
-    function hlElements()
+    static function hlElements()
     {
         return [
             'Audi',

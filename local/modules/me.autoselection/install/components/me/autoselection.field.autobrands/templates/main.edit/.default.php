@@ -6,7 +6,7 @@ $isMulti = $arResult['userField']['MULTIPLE'] === 'Y';
 
 <select name="<?=$arResult['fieldName'];?>" <?=($isMulti)? print 'multiple':''?>>
     <option value=""></option>
-    <?
+    <?php
     if (!empty($arResult['BRAND'])) {
         foreach ($arResult['BRAND'] as $BrandId => $BrandName) {
             $isSelected = false;
@@ -15,7 +15,7 @@ $isMulti = $arResult['userField']['MULTIPLE'] === 'Y';
             }
             ?>
             <option value="<?= $BrandName; ?>"<?=($isSelected)? print 'selected':'';?>><?= $BrandName?></option>
-            <?
+            <?php
         }
     }
     ?>

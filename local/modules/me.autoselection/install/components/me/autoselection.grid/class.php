@@ -42,7 +42,7 @@ class AutoselectionComponent extends CBitrixComponent
         $this->arResult['FILTER_ID'] = self::GRID_ID;
         $this->makeFilter();
         $this->makeToolbar();
-        $this->makeGrid();
+        $this->d();
         // Параметра для панели слайдера
         $this->arResult['SIDE_PANEL_PARAMS'] = [
             "newWindowsLabel" => Helpers\Options::getParam('SUR_SLIDER_NEW_WINDOWS') == 'Y',
@@ -124,7 +124,7 @@ class AutoselectionComponent extends CBitrixComponent
         }
     }
 
-    public function makeGrid()
+    public function d()
     {
         $this->arResult['GRID_ID'] = self::GRID_ID;
 
@@ -186,13 +186,13 @@ class AutoselectionComponent extends CBitrixComponent
             ->initFromUri();
 
         //Сортировка
-        $gridSort = $gridOptions->GetSorting(["sort" => ["SORT" => "ASC"]]);
-        $this->arResult['SORT'] = $gridSort['sort'];
-        $this->arResult['SORT_VARS'] = $gridSort['vars'];
-
+        //TODO разобравться с ошибкой
+//        $gridSort = $gridOptions->GetSorting();
+//        $this->arResult['SORT'] = $gridSort['sort'];
+//        $this->arResult['SORT_VARS'] = $gridSort['vars'];
         //region Обработка данных
         $autoSelectionRows = CIBlockElement::GetList(
-            $this->arResult['SORT'],
+            [],
             $arFilter,
             false,
             false,
